@@ -27,7 +27,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.warmfeet.joaoramiro.estagio1.SecondActivity" />
         </activity>
-        <activity android:name=".FourthActivity"></activity>
+        <activity android:name=".FourthActivity" />
+        <activity android:name=".FifthActivity_Btns"></activity>
     </application>
 
 </manifest>
