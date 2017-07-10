@@ -28,7 +28,8 @@
                 android:value="com.warmfeet.joaoramiro.estagio1.SecondActivity" />
         </activity>
         <activity android:name=".FourthActivity" />
-        <activity android:name=".FifthActivity_Btns"></activity>
+        <activity android:name=".FifthActivity_Btns" />
+        <activity android:name=".sixthevents"></activity>
     </application>
 
 </manifest>

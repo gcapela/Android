@@ -56,7 +56,7 @@ public class FirstActivity extends AppCompatActivity {
             startActivity(intent);
         }else
         {
-            Intent intent = new Intent(this,ThirdActivity.class);
+            Intent intent = new Intent(this,sixthevents.class);
             startActivity(intent);
         }
     }
