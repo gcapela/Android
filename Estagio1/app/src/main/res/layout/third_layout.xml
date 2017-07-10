@@ -7,11 +7,12 @@
     <TextView
         android:text="WELCOME TO THE THIRD ACTIVITY"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/textView213"
         tools:text="TERCEIRA" />
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/hint_message"/>
+        android:layout_height="match_parent"
+        android:hint="@string/hint_message"
+        android:id="@+id/firstEditTxt"/>
 </LinearLayout>
