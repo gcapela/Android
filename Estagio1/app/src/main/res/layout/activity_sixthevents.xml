@@ -37,4 +37,77 @@
         android:id="@+id/country"
         android:hint="@string/select"
         />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.11"
+        android:text="select fruits"
+        android:textAppearance="?android:textAppearanceLarge" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fruit_apple"
+        android:text="apple"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fruit_orange"
+        android:text="orange"
+        android:onClick="selectItem"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fruit_grapes"
+        android:text="grapes"
+        android:onClick="selectItem"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fruit_peach"
+        android:text="peach"
+        android:onClick="selectItem"/>
+
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="Done"
+        android:onClick="finalSelection"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/final_result"
+        android:text="Heya"/>
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tooglebtn1"
+        android:textOn="Homo"
+        android:textOff="Gay"
+        android:onClick="toggleFunc"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="btnstate"
+        android:id="@+id/resultToggle"/>
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+<Button
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="ShowDialog"
+    android:id="@+id/butony"
+    android:onClick="showDialog"/>
 </LinearLayout>
