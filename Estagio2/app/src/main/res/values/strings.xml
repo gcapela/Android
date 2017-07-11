@@ -11,4 +11,7 @@
     <string name="bluetoothDenied">Nigga U Dumb?</string>
 
     <string name="paired_devices">Paired Devices</string>
+
+
+    <string name="disconnect">Disconnect</string>
 </resources>

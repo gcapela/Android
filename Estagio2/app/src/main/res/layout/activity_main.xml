@@ -76,6 +76,7 @@
         android:text="Update"
         android:paddingTop="16dp"
         android:layout_below="@id/tempTxt"
+        android:onClick="sendData"
         />
 
 </RelativeLayout>
