@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="warmfeet.com.joaoramiro.estagio2.MainActivity"
+    android:paddingLeft="16dp"
+    android:paddingBottom="16dp">
+
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/meas"
+    android:id="@+id/meas"/>
+
+    <TextView
+        android:id="@+id/voltTxt"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/voltage"
+        android:layout_below="@id/meas"
+     android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/volt"
+
+        />
+
+    <TextView
+        android:id="@+id/volt"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="36.0 V"
+        android:layout_below="@id/meas"
+        android:layout_alignParentEnd="true"
+        />
+
+    <TextView
+        android:id="@+id/currTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/current"
+        android:layout_below="@id/voltTxt"
+        />
+
+    <TextView
+        android:id="@+id/curr"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="69 mA"
+        android:layout_below="@id/volt"
+        android:layout_alignParentEnd="true"
+        />
+
+    <TextView
+        android:id="@+id/tempTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/temperature"
+        android:layout_below="@+id/currTxt"
+        />
+
+    <TextView
+        android:id="@+id/temp"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="200 ºC"
+        android:layout_below="@+id/curr"
+        android:layout_alignParentEnd="true"
+        />
+
+    <Button
+        android:id="@+id/updateBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update"
+        android:paddingTop="16dp"
+        android:layout_below="@id/tempTxt"
+        />
+
+</RelativeLayout>
