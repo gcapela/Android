@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.IntegerRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,9 +17,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -95,35 +101,80 @@ public class MainActivity extends AppCompatActivity {
                 {
                     String receivedData = (String)msg.obj;
 
-                    Toast.makeText(getBaseContext(),"RECEIVED: " + receivedData,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(),receivedData,Toast.LENGTH_SHORT).show();
 
-                    //stringbuild faz cenas com a string recebida
-                    dadosBt.append(receivedData);
+                        byte[] b = receivedData.getBytes();
+                        //recebe obj e convert em bytes
 
-                    int fimInfo = dadosBt.indexOf("}");
+                        //funciona mais ou menos
+                        //byteData = getBytes(msg.obj);
 
-                    if(fimInfo>0)
-                    {
-                        //String complete= dadosBt.indexOf("{");
-                        String complete = dadosBt.substring(0,fimInfo);
 
-                        int sizeInfo = complete.length();
-
-                        if(dadosBt.charAt(0)=='{')
+                        if(b.length>0)
                         {
-                            String finalData=dadosBt.substring(1,sizeInfo);
+                            //weird shite happens when msb is one
 
-                            Log.d("Recebidos",finalData);
-                            Toast.makeText(getBaseContext(),"DONE",Toast.LENGTH_SHORT).show();
+                            int id = b[0];
+                            id=id >>6;
+                            int data =b[0]>>1;
+                            data = data& ~(1 << 7);
+                            data = data & ~(1 << 6);
+                            data = data & ~(1 << 5);
+                            //String s = new String(b);
+                           Toast.makeText(getBaseContext(), Integer.toString(id),Toast.LENGTH_SHORT).show();
+
+                            if(id==0)
+                            {
+                                Toast.makeText(getBaseContext(),"Tensao",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
+                            }else if(id==-1)
+                            {
+                                Toast.makeText(getBaseContext(),"Corrente",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
+                            }else if(id==1)
+                            {
+                                Toast.makeText(getBaseContext(),"Potencia",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
+                            }
                         }
 
-                        dadosBt.delete(0,dadosBt.length());
 
-                    }
+
+
                 }
             }
         };
     }
+    int fromByteArray(byte[] bytes) {
+        return ByteBuffer.wrap(bytes).getInt();
+    }
+
+    public static byte[] serialize(Object obj) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ObjectOutputStream os = new ObjectOutputStream(out);
+        os.writeObject(obj);
+        return out.toByteArray();
+    }
+
+    private static byte[] getBytes(Object obj) throws java.io.IOException{
+
+        byte [] data=null;
+
+        try{
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(obj);
+        oos.flush();
+        oos.close();
+        bos.close();
+        data = bos.toByteArray();}
+        catch (Exception e)
+        {
+
+        }
+        return data;
+    }
+
 
     //creates the option menu
     @Override
