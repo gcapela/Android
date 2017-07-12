@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -35,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
 
     //defines if bluetooth is connected
     boolean connected=false;
+
+    TextView curr;
+    TextView volt;
+    TextView temp;
 
 
     //flags
@@ -91,6 +96,10 @@ public class MainActivity extends AppCompatActivity {
         //sets update button
         updateBtn=(Button)findViewById(R.id.updateBtn);
 
+        curr=(TextView)findViewById(R.id.curr);
+        volt=(TextView)findViewById(R.id.volt);
+        temp=(TextView)findViewById(R.id.temp);
+
         //sets handler
         mHandler=new Handler(){
 
@@ -99,44 +108,47 @@ public class MainActivity extends AppCompatActivity {
                 //if it came via the bluetooth thread
                 if(msg.what==MESSAGE_READ)
                 {
-                    String receivedData = (String)msg.obj;
 
-                    Toast.makeText(getBaseContext(),receivedData,Toast.LENGTH_SHORT).show();
+                    byte[]b=null;
 
-                        byte[] b = receivedData.getBytes();
-                        //recebe obj e convert em bytes
+                    try{
+                        b=getBytes(msg.obj);
+                    }catch (IOException e)
+                    {
 
-                        //funciona mais ou menos
-                        //byteData = getBytes(msg.obj);
+                    }
 
+                    //IS IT ALWAYS BYTE 27?
+                    int id = b[27]& 0xFF;
+                    id=id >>6;
+                    int data =b[27]>>1;
+                    data = data& ~(1 << 7);
+                    data = data & ~(1 << 6);
+                    data = data & ~(1 << 5);
+                    data = data& 0xFF;
+                    //Toast.makeText(getBaseContext(), Integer.toString(id),Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getBaseContext(), Integer.toString(data),Toast.LENGTH_SHORT).show();
 
-                        if(b.length>0)
-                        {
-                            //weird shite happens when msb is one
-
-                            int id = b[0];
-                            id=id >>6;
-                            int data =b[0]>>1;
-                            data = data& ~(1 << 7);
-                            data = data & ~(1 << 6);
-                            data = data & ~(1 << 5);
-                            //String s = new String(b);
-                           Toast.makeText(getBaseContext(), Integer.toString(id),Toast.LENGTH_SHORT).show();
-
-                            if(id==0)
-                            {
-                                Toast.makeText(getBaseContext(),"Tensao",Toast.LENGTH_SHORT).show();
-                                Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
-                            }else if(id==-1)
-                            {
-                                Toast.makeText(getBaseContext(),"Corrente",Toast.LENGTH_SHORT).show();
-                                Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
-                            }else if(id==1)
-                            {
-                                Toast.makeText(getBaseContext(),"Potencia",Toast.LENGTH_SHORT).show();
-                                Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
-                            }
-                        }
+                    String str="";
+                    if(id==1)
+                    {
+                        //Toast.makeText(getBaseContext(),"Tensao",Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
+                        str=Integer.toString(data)+" V";
+                        volt.setText(str);
+                    }else if(id==2)
+                    {
+                        //Toast.makeText(getBaseContext(),"Corrente",Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
+                        str=Integer.toString(data)+" mA";
+                        curr.setText(str);
+                    }else if(id==3)
+                    {
+                       // Toast.makeText(getBaseContext(),"Temperatura",Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
+                        str=Integer.toString(data)+" ºC";
+                        temp.setText(str);
+                    }
 
 
 
@@ -299,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
 
         //called from Update Button
         public void sendData(View v) {
-        if(connected)
+       /* if(connected)
         {
             //sends message to bt device
             thread.write("step");
@@ -308,8 +320,55 @@ public class MainActivity extends AppCompatActivity {
         {
             //requests user to connect to device
             Toast.makeText(getBaseContext(),"Plz liga te ao dispositivo primeiro",Toast.LENGTH_SHORT).show();
+        }*/
+
+            String receivedData = "\u0087";
+            int[] intArray=new int[receivedData.length()];
+            //Toast.makeText(getBaseContext(),receivedData,Toast.LENGTH_SHORT).show();
+
+            //     byte[] b = receivedData.getBytes();
+
+
+            int i=0;
+            for(i=0;i<receivedData.length();i++) {
+
+                intArray[i] = (int) receivedData.charAt(i);
+            }
+
+
+            //weird shite happens when msb is one
+
+            int id = intArray[0]& 0xFF;
+            id=id >>6;
+            int data =intArray[0]>>1;
+            data = data& ~(1 << 7);
+            data = data & ~(1 << 6);
+            data = data & ~(1 << 5);
+            data = data& 0xFF;
+            //String s = new String(b);
+            Toast.makeText(getBaseContext(), Integer.toString(id),Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), Integer.toString(data),Toast.LENGTH_SHORT).show();
+
+            if(id==1)
+            {
+                Toast.makeText(getBaseContext(),"Tensao",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
+                volt.setText( Integer.toString(data));
+            }else if(id==2)
+            {
+                Toast.makeText(getBaseContext(),"Corrente",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
+                curr.setText(Integer.toString(data));
+            }else if(id==3)
+            {
+                Toast.makeText(getBaseContext(),"Potencia",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
+                temp.setText(Integer.toString(data));
+            }
+
+
+
         }
-    }
 
 
 //https://developer.android.com/guide/topics/connectivity/bluetooth.html#ManagingAConnection
@@ -343,32 +402,27 @@ private class ConnectedThread extends Thread {
 
 
 
-//gets data from  bt device
-    public void run() {
-        mmBuffer = new byte[1024];
-        int numBytes; // bytes returned from read()
+            //gets data from  bt device
+            public void run() {
+                mmBuffer = new byte[1024];
+                int numBytes; // bytes returned from read()
 
-        // Keep listening to the InputStream until an exception occurs.
-           while (true) {
-                try {
-                    // Read from the InputStream.
-                    numBytes = mmInStream.read(mmBuffer);
-                    // Send the obtained bytes to the UI activity.
-
-                    //Converts bytes to string
-                    String dadosBlue = new String(mmBuffer,0,numBytes);
-
-
-                    //gets us the msg
-                    Message readMsg = mHandler.obtainMessage(MESSAGE_READ, numBytes, -1,
-                            dadosBlue);
-                    readMsg.sendToTarget();
-                } catch (IOException e) {
-                  //  Log.d(TAG, "Input stream was disconnected", e);
-                    break;
+                // Keep listening to the InputStream until an exception occurs.
+                while (true) {
+                    try {
+                        // Read from the InputStream.
+                        numBytes = mmInStream.read(mmBuffer);
+                        // Send the obtained bytes to the UI activity.
+                        Message readMsg = mHandler.obtainMessage(
+                                MESSAGE_READ, numBytes, -1,
+                                mmBuffer);
+                        readMsg.sendToTarget();
+                    } catch (IOException e) {
+                       // Log.d(TAG, "Input stream was disconnected", e);
+                        break;
+                    }
                 }
             }
-    }
 
     // Call this from the main activity to send data to the remote device.
         /*public void write(byte[] bytes) {

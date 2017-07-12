@@ -78,5 +78,10 @@
         android:layout_below="@id/tempTxt"
         android:onClick="sendData"
         />
+    <TextView
+        android:layout_below="@id/updateBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="LOL"/>
 
 </RelativeLayout>
