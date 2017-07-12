@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getBaseContext(),"RECEIVED: " + receivedData,Toast.LENGTH_SHORT).show();
 
                     //stringbuild faz cenas com a string recebida
-                    dadosBt.append(receivedData);
+                    //dadosBt.append(receivedData);
 
                     int fimInfo = dadosBt.indexOf("}");
 
@@ -362,6 +362,7 @@ private class ConnectedThread extends Thread {
                     "Couldn't send data to the other device");
             writeErrorMsg.setData(bundle);
             mHandler.sendMessage(writeErrorMsg);
+
         }
     }
 
