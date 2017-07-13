@@ -6,14 +6,16 @@
     android:layout_height="match_parent"
     tools:context="warmfeet.com.joaoramiro.estagio2.MainActivity"
     android:paddingLeft="16dp"
-    android:paddingBottom="16dp">
+    android:paddingRight="16dp">
 
 
 <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="@string/meas"
-    android:id="@+id/meas"/>
+    android:id="@+id/meas"
+    android:textSize="20dp"
+    android:textStyle="bold"/>
 
     <TextView
         android:id="@+id/voltTxt"
@@ -23,7 +25,7 @@
         android:layout_below="@id/meas"
      android:layout_alignParentLeft="true"
         android:layout_toLeftOf="@+id/volt"
-
+        android:textSize="20dp"
         />
 
     <TextView
@@ -33,6 +35,8 @@
         android:text="36.0 V"
         android:layout_below="@id/meas"
         android:layout_alignParentEnd="true"
+        android:textSize="20dp"
+        android:gravity="right"
         />
 
     <TextView
@@ -41,6 +45,7 @@
         android:layout_height="wrap_content"
         android:text="@string/current"
         android:layout_below="@id/voltTxt"
+        android:textSize="20dp"
         />
 
     <TextView
@@ -50,6 +55,8 @@
         android:text="69 mA"
         android:layout_below="@id/volt"
         android:layout_alignParentEnd="true"
+        android:textSize="20dp"
+        android:gravity="right"
         />
 
     <TextView
@@ -58,6 +65,7 @@
         android:layout_height="wrap_content"
         android:text="@string/temperature"
         android:layout_below="@+id/currTxt"
+        android:textSize="20dp"
         />
 
     <TextView
@@ -67,8 +75,10 @@
         android:text="200 ºC"
         android:layout_below="@+id/curr"
         android:layout_alignParentEnd="true"
+        android:textSize="20dp"
+        android:gravity="right"
         />
-
+<!--
     <Button
         android:id="@+id/updateBtn"
         android:layout_width="wrap_content"
@@ -78,10 +88,11 @@
         android:layout_below="@id/tempTxt"
         android:onClick="sendData"
         />
-    <TextView
-        android:layout_below="@id/updateBtn"
+-->
+    <com.jjoe64.graphview.GraphView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="LOL"/>
-
+        android:layout_height="300dp"
+        android:id="@+id/graph1"
+        android:layout_below="@id/temp"
+        />
 </RelativeLayout>

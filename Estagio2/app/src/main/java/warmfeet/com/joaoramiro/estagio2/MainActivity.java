@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.IntegerRes;
@@ -18,6 +19,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.Viewport;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.Series;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +32,9 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,14 +42,24 @@ public class MainActivity extends AppCompatActivity {
     //BUtton sends data via bluetooth
     Button updateBtn;
 
-
     //defines if bluetooth is connected
     boolean connected=false;
 
+    //Text view for values
     TextView curr;
     TextView volt;
     TextView temp;
 
+    //graphic element
+    GraphView graph;
+
+    //series for 3 values, voltage current temperature
+    LineGraphSeries<DataPoint> series;
+    LineGraphSeries<DataPoint> seriesI;
+    LineGraphSeries<DataPoint> seriesT;
+
+
+    double lastX=2d;
 
     //flags
     private static final int REQUEST_ENABLE_BT = 1; //if user said yes to enable bt
@@ -48,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int MESSAGE_READ = 3;  //comes from read msg
     public static final int MESSAGE_WRITE = 4;//comes from writing a msg
     public static final int MESSAGE_TOAST = 5;
+
+    long startTime;
 
     //bt adapter of the smartphone
     BluetoothAdapter mBluetoothAdapter;
@@ -81,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //check if thte is a bt adapter on smartphone
+        //check if the is a bt adapter on smartphone
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Toast.makeText(getApplicationContext(),R.string.no_bluetooth,Toast.LENGTH_LONG);
@@ -94,11 +115,55 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //sets update button
-        updateBtn=(Button)findViewById(R.id.updateBtn);
+      //  updateBtn=(Button)findViewById(R.id.updateBtn);
 
+
+        //sets textviews as variables
         curr=(TextView)findViewById(R.id.curr);
         volt=(TextView)findViewById(R.id.volt);
         temp=(TextView)findViewById(R.id.temp);
+
+
+        //graphics stuff
+        graph=(GraphView)findViewById(R.id.graph1);
+
+
+        //sets series for voltage current and temperature
+        series=new LineGraphSeries<>();
+        seriesI=new LineGraphSeries<>();
+        seriesT=new LineGraphSeries<>();
+
+        //adds series to the graphic
+        graph.addSeries(series);
+        graph.addSeries(seriesI);
+        graph.addSeries(seriesT);
+
+
+        //sets colors for the series
+        series.setColor(Color.GREEN);
+        seriesI.setColor(Color.BLUE);
+        seriesT.setColor(Color.RED);
+
+        //viewport stuff
+
+        graph.getViewport().setScalable(true);
+        // activate horizontal scrolling
+        graph.getViewport().setScrollable(true);
+        // activate horizontal zooming and scrolling
+        graph.getViewport().setScalableY(true);
+        // activate horizontal scrolling
+        graph.getViewport().setScrollableY(true);
+        //dont display vertical line at 0
+        graph.getGridLabelRenderer().setHighlightZeroLines(false);
+
+        //sets bounds for the graphic
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(100);
+
+
+        //Maybe set this elsewhere
+        startTime = System.currentTimeMillis() / 1000;
 
         //sets handler
         mHandler=new Handler(){
@@ -111,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
                     byte[]b=null;
 
+                    //gets bytes from buffer
                     try{
                         b=getBytes(msg.obj);
                     }catch (IOException e)
@@ -118,36 +184,59 @@ public class MainActivity extends AppCompatActivity {
 
                     }
 
+                    //Toast.makeText(getBaseContext(), Integer.toString(b[27]),Toast.LENGTH_SHORT).show();
                     //IS IT ALWAYS BYTE 27?
+
+                    //gets id
                     int id = b[27]& 0xFF;
                     id=id >>6;
+
+                    //gets data
                     int data =b[27]>>1;
                     data = data& ~(1 << 7);
                     data = data & ~(1 << 6);
                     data = data & ~(1 << 5);
                     data = data& 0xFF;
+
+
                     //Toast.makeText(getBaseContext(), Integer.toString(id),Toast.LENGTH_SHORT).show();
                     //Toast.makeText(getBaseContext(), Integer.toString(data),Toast.LENGTH_SHORT).show();
 
+                    //auxiliary string
                     String str="";
                     if(id==1)
                     {
-                        //Toast.makeText(getBaseContext(),"Tensao",Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(getBaseContext(),"Tensao",Toast.LENGTH_SHORT).show();
                        // Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
                         str=Integer.toString(data)+" V";
                         volt.setText(str);
+
+                        //Toast.makeText(getBaseContext(),Long.toString((System.currentTimeMillis() / 1000 -startTime)/100),Toast.LENGTH_SHORT).show();
+
+                        //addpoint to the graph series
+                        series.appendData(new DataPoint(System.currentTimeMillis() / 1000 -startTime, data), true, 100);
                     }else if(id==2)
                     {
                         //Toast.makeText(getBaseContext(),"Corrente",Toast.LENGTH_SHORT).show();
                        // Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
                         str=Integer.toString(data)+" mA";
+
                         curr.setText(str);
+
+                        //addpoint to the graph series
+                        seriesI.appendData(new DataPoint(System.currentTimeMillis() / 100 -startTime, data), true, 100);
+
                     }else if(id==3)
                     {
-                       // Toast.makeText(getBaseContext(),"Temperatura",Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(),"Temperatura",Toast.LENGTH_SHORT).show();
                        // Toast.makeText(getBaseContext(),Integer.toString(data),Toast.LENGTH_SHORT).show();
                         str=Integer.toString(data)+" ºC";
+
                         temp.setText(str);
+
+                        //adds point to graph series
+                        seriesT.appendData(new DataPoint(System.currentTimeMillis() / 100 -startTime, data), true, 100);
+
                     }
 
 
@@ -157,18 +246,16 @@ public class MainActivity extends AppCompatActivity {
             }
         };
     }
-    int fromByteArray(byte[] bytes) {
-        return ByteBuffer.wrap(bytes).getInt();
-    }
 
-    public static byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
-        os.writeObject(obj);
-        return out.toByteArray();
-    }
+    //add entry to graph
+    public void AddEntry() {
 
-    private static byte[] getBytes(Object obj) throws java.io.IOException{
+        lastX += 0.1d;
+        series.appendData(new DataPoint(lastX, Math.cos(lastX)), true, 100);
+
+        }
+
+     private static byte[] getBytes(Object obj) throws java.io.IOException{
 
         byte [] data=null;
 
@@ -269,7 +356,6 @@ public class MainActivity extends AppCompatActivity {
 
                     //gets the key from the other activity
                     MAC = data.getExtras().getString(ListaDispositivos.ENDERECO_MAC);
-                    Toast.makeText(getBaseContext(), "MAC OBTAINED", Toast.LENGTH_SHORT).show();
 
                     //sets bt device
                     mBluetoothDevice = mBluetoothAdapter.getRemoteDevice(MAC);
@@ -309,8 +395,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+
         //called from Update Button
         public void sendData(View v) {
+
+            //TO SEND DATA
        /* if(connected)
         {
             //sends message to bt device
@@ -322,6 +412,12 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getBaseContext(),"Plz liga te ao dispositivo primeiro",Toast.LENGTH_SHORT).show();
         }*/
 
+       //TO ADD POINT
+            AddEntry();
+
+
+       //TESTS FOR PROTOCOL
+       /*
             String receivedData = "\u0087";
             int[] intArray=new int[receivedData.length()];
             //Toast.makeText(getBaseContext(),receivedData,Toast.LENGTH_SHORT).show();
@@ -366,7 +462,7 @@ public class MainActivity extends AppCompatActivity {
                 temp.setText(Integer.toString(data));
             }
 
-
+*/
 
         }
 

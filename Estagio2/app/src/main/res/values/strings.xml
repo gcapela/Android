@@ -3,8 +3,8 @@
     <string name="connect">Connect</string>
     <string name="meas">Medidas</string>
     <string name="voltage">Tensão</string>
-    <string name="current">Current</string>
-    <string name="temperature">Temperature</string>
+    <string name="current">Corrente</string>
+    <string name="temperature">Temperatura</string>
 
     <string name="no_bluetooth">No bluetooth for you faggot</string>
     <string name="bluetoothConnected">Bluetooth Successfully Activated</string>
