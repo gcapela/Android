@@ -26,7 +26,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -54,6 +56,7 @@ public class DeviceControlActivity extends Activity {
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
 
+    Handler mHandler;
 
     //BUtton sends data via bluetooth
     Button updateBtn;
@@ -118,7 +121,7 @@ public class DeviceControlActivity extends Activity {
                 clearUI();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
-                displayGattServices(mBluetoothLeService.getSupportedGattServices());
+               // displayGattServices(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
@@ -160,7 +163,7 @@ public class DeviceControlActivity extends Activity {
     };
 
     private void clearUI() {
-        mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
+        //mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
         mDataField.setText(R.string.no_data);
     }
 
@@ -202,6 +205,18 @@ public class DeviceControlActivity extends Activity {
             final boolean result = mBluetoothLeService.connect(mDeviceAddress);
             Log.d(TAG, "Connect request result=" + result);
         }
+
+        mHandler= new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+
+                if(mBluetoothLeService != null) {
+                    mBluetoothLeService.readCustomCharacteristic();
+                }
+
+            }
+        };
+
     }
 
     @Override
@@ -336,5 +351,45 @@ public class DeviceControlActivity extends Activity {
         volt.setText(aux);
 
 
+    }
+    class MyThread implements Runnable{
+        @Override
+        public void run() {
+            //empty msg
+
+
+            //this loop crashes app
+            for (int i=0;i<=100;i++)
+            {
+                Message message= Message.obtain();
+                message.arg1=i;
+                mHandler.sendMessage(message);
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            /*
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    //do stuff on main thread
+                }
+            });*/
+        }
+    }
+
+    public void onClickWrite(View v){
+        if(mBluetoothLeService != null) {
+            mBluetoothLeService.writeCustomCharacteristic(0xAA);
+        }
+    }
+
+    public void onClickRead(View v){
+        if(mBluetoothLeService != null) {
+            mBluetoothLeService.readCustomCharacteristic();
+        }
     }
 }
