@@ -46,28 +46,46 @@ import java.util.List;
  * Bluetooth LE API.
  */
 public class DeviceControlActivity extends Activity {
+
+    //tag for this activity for debugging puposes
     private final static String TAG = DeviceControlActivity.class.getSimpleName();
 
+    //receives this  2 things from previous activity
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
+    //textviews in gatt_services_characteristics
     private TextView mConnectionState;
     private TextView mDataField;
+
+    //name and address
     private String mDeviceName;
     private String mDeviceAddress;
+
+    //list where small lists on item click
     private ExpandableListView mGattServicesList;
+
+    //instance of BluetoothLeService class
     private BluetoothLeService mBluetoothLeService;
+
+    //creates arraylist where each item is an array list where each item is a BtGatt Characteristic
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
             new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
+
+    //if its connected to device
     private boolean mConnected = false;
+
+    //notify characteristic what?
     private BluetoothGattCharacteristic mNotifyCharacteristic;
 
+    //name and uuid of service or characteristic
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
 
-    // Code to manage Service lifecycle.
+    // Code to manage Service lifecycle.  service connection is a binded service
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
-
+    //automatically creates a service
+        //initializes and connects to given address
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
@@ -84,29 +102,38 @@ public class DeviceControlActivity extends Activity {
             mBluetoothLeService = null;
         }
     };
-
+    //gets stuff from service
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
     // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
     // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
     // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
     //                        or notification operations.
+
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
+                //changes text of  connection state variable
                 updateConnectionState(R.string.connected);
                 invalidateOptionsMenu();
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
+                //changes text of connection state variable
                 updateConnectionState(R.string.disconnected);
                 invalidateOptionsMenu();
+                //clears expandable list
                 clearUI();
+
+                //if you found finally found the services
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 displayGattServices(mBluetoothLeService.getSupportedGattServices());
+
+
+                //changes data field is it here that shows data?
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
@@ -117,15 +144,26 @@ public class DeviceControlActivity extends Activity {
     // demonstrates 'Read' and 'Notify' features.  See
     // http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
     // list of supported characteristic features.
+
+    //when you click on characteristic (you can read or notify)
     private final ExpandableListView.OnChildClickListener servicesListClickListner =
             new ExpandableListView.OnChildClickListener() {
                 @Override
+                //onclick on characteristic
                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
                                             int childPosition, long id) {
+
+                    //if there is items on the expandable view
                     if (mGattCharacteristics != null) {
+
+                        //gets item clicked
                         final BluetoothGattCharacteristic characteristic =
                                 mGattCharacteristics.get(groupPosition).get(childPosition);
+
+                        //gets characteristic properties of clicked item
                         final int charaProp = characteristic.getProperties();
+
+                        //if there is charateristics on that item
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
                             // If there is an active notification on a characteristic, clear
                             // it first so it doesn't update the data field on the user interface.
@@ -136,6 +174,8 @@ public class DeviceControlActivity extends Activity {
                             }
                             mBluetoothLeService.readCharacteristic(characteristic);
                         }
+
+                        //if you can notify  set to notify
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mNotifyCharacteristic = characteristic;
                             mBluetoothLeService.setCharacteristicNotification(
@@ -155,8 +195,11 @@ public class DeviceControlActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //opens that layout
         setContentView(R.layout.gatt_services_characteristics);
 
+        //gets an intent and sets strings
         final Intent intent = getIntent();
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
@@ -170,6 +213,8 @@ public class DeviceControlActivity extends Activity {
 
         getActionBar().setTitle(mDeviceName);
         getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //gets bound to this activity
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
@@ -177,6 +222,8 @@ public class DeviceControlActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        //connects to service
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(mDeviceAddress);
@@ -244,6 +291,7 @@ public class DeviceControlActivity extends Activity {
     // Demonstrates how to iterate through the supported GATT Services/Characteristics.
     // In this sample, we populate the data structure that is bound to the ExpandableListView
     // on the UI.
+
     private void displayGattServices(List<BluetoothGattService> gattServices) {
         if (gattServices == null) return;
         String uuid = null;
@@ -298,6 +346,8 @@ public class DeviceControlActivity extends Activity {
         mGattServicesList.setAdapter(gattServiceAdapter);
     }
 
+
+    //makes this things happen when we register it
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);

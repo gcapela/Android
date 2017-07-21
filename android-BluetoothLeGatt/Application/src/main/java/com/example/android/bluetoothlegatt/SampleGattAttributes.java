@@ -21,6 +21,7 @@ import java.util.HashMap;
 /**
  * This class includes a small subset of standard GATT attributes for demonstration purposes.
  */
+//it is used to hold either services or characteristic
 public class SampleGattAttributes {
     private static HashMap<String, String> attributes = new HashMap();
     public static String HEART_RATE_MEASUREMENT = "00002a37-0000-1000-8000-00805f9b34fb";

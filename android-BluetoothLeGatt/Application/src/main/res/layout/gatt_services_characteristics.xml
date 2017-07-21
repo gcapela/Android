@@ -65,7 +65,11 @@
                   android:text="@string/no_data"
                   android:textSize="18sp"/>
     </LinearLayout>
-    <ExpandableListView android:id="@+id/gatt_services_list"
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DEBUG STRING"
+        android:textSize="18sp"/>
+    <ExpandableListView android:id="@+id/debugTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 </LinearLayout>

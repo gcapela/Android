@@ -42,11 +42,20 @@ import java.util.ArrayList;
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
 public class DeviceScanActivity extends ListActivity {
+
+    //Class List adapter that receives le devices
     private LeDeviceListAdapter mLeDeviceListAdapter;
+
+    //basic bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter;
+
+    //bool to check if is scanning
     private boolean mScanning;
+
+    //handler associated with a service?
     private Handler mHandler;
 
+    //constant for checking result OK
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
@@ -54,7 +63,11 @@ public class DeviceScanActivity extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //sets title
         getActionBar().setTitle(R.string.title_devices);
+
+        //created instance of the handler, it is now assoicated to this activity
         mHandler = new Handler();
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
@@ -167,6 +180,7 @@ public class DeviceScanActivity extends ListActivity {
                     mScanning = false;
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
                     invalidateOptionsMenu();
+
                 }
             }, SCAN_PERIOD);
 
@@ -177,6 +191,7 @@ public class DeviceScanActivity extends ListActivity {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
         }
         invalidateOptionsMenu();
+
     }
 
     // Adapter for holding devices found through scanning.
@@ -245,7 +260,7 @@ public class DeviceScanActivity extends ListActivity {
         }
     }
 
-    // Device scan callback.
+    // Device scan callback. add the device found
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
 
