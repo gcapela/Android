@@ -174,8 +174,8 @@ public class DeviceControlActivity extends Activity {
         mConnectionState = (TextView) findViewById(R.id.connection_state);
         mDataField = (TextView) findViewById(R.id.data_value);
 
-
-        thread=new Thread(new myThread());
+//UNCOMMENT THIS CODE TO MAKE THREAD RUN
+     /*   thread=new Thread(new myThread());
         thread.start();
         handler=new Handler(){
             @Override
@@ -186,7 +186,7 @@ public class DeviceControlActivity extends Activity {
                     mBluetoothLeService.readCustomCharacteristic();
                 }
             }
-        };
+        };*/
 
         getActionBar().setTitle(mDeviceName);
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -339,6 +339,12 @@ public class DeviceControlActivity extends Activity {
     public void onClickRead(View v){
         if(mBluetoothLeService != null) {
             mBluetoothLeService.readCustomCharacteristic();
+        }
+    }
+
+    public void onClickNotify(View v){
+        if(mBluetoothLeService != null) {
+            mBluetoothLeService.notifyCustomCharacteristic(1);
         }
     }
 
