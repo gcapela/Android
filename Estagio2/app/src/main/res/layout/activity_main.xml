@@ -17,7 +17,7 @@
     android:textSize="20dp"
     android:textStyle="bold"/>
 
-    <TextView
+<TextView
         android:id="@+id/voltTxt"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
