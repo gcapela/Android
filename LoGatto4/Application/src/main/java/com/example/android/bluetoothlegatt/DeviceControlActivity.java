@@ -112,7 +112,7 @@ public class DeviceControlActivity extends Activity {
                 clearUI();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
-                displayGattServices(mBluetoothLeService.getSupportedGattServices());
+               // displayGattServices(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
@@ -154,7 +154,7 @@ public class DeviceControlActivity extends Activity {
     };
 
     private void clearUI() {
-        mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
+        //mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
         mDataField.setText(R.string.no_data);
     }
 
@@ -168,14 +168,14 @@ public class DeviceControlActivity extends Activity {
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
 
         // Sets up UI references.
-        ((TextView) findViewById(R.id.device_address)).setText(mDeviceAddress);
+        /*((TextView) findViewById(R.id.device_address)).setText(mDeviceAddress);
         mGattServicesList = (ExpandableListView) findViewById(R.id.gatt_services_list);
         mGattServicesList.setOnChildClickListener(servicesListClickListner);
-        mConnectionState = (TextView) findViewById(R.id.connection_state);
+        mConnectionState = (TextView) findViewById(R.id.connection_state);*/
         mDataField = (TextView) findViewById(R.id.data_value);
 
 //UNCOMMENT THIS CODE TO MAKE THREAD RUN
-     /*   thread=new Thread(new myThread());
+        thread=new Thread(new myThread());
         thread.start();
         handler=new Handler(){
             @Override
@@ -186,7 +186,7 @@ public class DeviceControlActivity extends Activity {
                     mBluetoothLeService.readCustomCharacteristic();
                 }
             }
-        };*/
+        };
 
         getActionBar().setTitle(mDeviceName);
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -253,7 +253,7 @@ public class DeviceControlActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mConnectionState.setText(resourceId);
+                //mConnectionState.setText(resourceId);
             }
         });
     }
@@ -261,6 +261,28 @@ public class DeviceControlActivity extends Activity {
     private void displayData(String data) {
         if (data != null) {
             mDataField.setText(data);
+
+            //THIS LINE DOES THE TRICK BUT ONLY IN THiS SITUATION
+           // mDataField.setText(Integer.toString(data.charAt(0)));
+
+
+            //FOR DEBUGGING PURPOSES
+            /*
+            for (int i=0; i<data.length();i++)
+            {
+               // String val = data.substring(i,i+1);
+                int chars= data.charAt(i);
+                //Toast.makeText(getBaseContext(),val,Toast.LENGTH_SHORT).show();
+                Log.d(TAG,Integer.toString(chars));
+            }*/
+
+
+            String val = data.substring(2,4);
+            Log.d(TAG,val);
+            //Toast.makeText(getBaseContext(),val,Toast.LENGTH_SHORT).show();
+            int value=Integer.decode("0x"+val);
+            mDataField.setText(Integer.toString(value));
+            //Toast.makeText(getBaseContext(),Integer.toString(value),Toast.LENGTH_SHORT).show();
         }
     }
 
