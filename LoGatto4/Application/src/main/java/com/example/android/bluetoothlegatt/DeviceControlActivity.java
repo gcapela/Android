@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -37,6 +38,10 @@ import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,6 +75,17 @@ public class DeviceControlActivity extends Activity {
 
     Thread thread;
     Handler handler;
+
+    //graphic stuff
+    //graphic element
+    GraphView graph;
+
+    //series for 3 values, voltage current temperature
+    LineGraphSeries<DataPoint> series;
+    LineGraphSeries<DataPoint> seriesI;
+    LineGraphSeries<DataPoint> seriesT;
+
+    long startTime=-1;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -195,6 +211,47 @@ public class DeviceControlActivity extends Activity {
 
 
 
+        //graphics stuff
+        graph=(GraphView)findViewById(R.id.graph1);
+
+
+
+        //sets series for voltage current and temperature
+        series=new LineGraphSeries<>();
+        seriesI=new LineGraphSeries<>();
+        seriesT=new LineGraphSeries<>();
+
+        //adds series to the graphic
+        graph.addSeries(series);
+        graph.addSeries(seriesI);
+        graph.addSeries(seriesT);
+
+
+        //sets colors for the series
+        series.setColor(Color.GREEN);
+        seriesI.setColor(Color.BLUE);
+        seriesT.setColor(Color.RED);
+
+        //viewport stuff
+
+        graph.getViewport().setScalable(true);
+        // activate horizontal scrolling
+        graph.getViewport().setScrollable(true);
+        // activate horizontal zooming and scrolling
+        graph.getViewport().setScalableY(true);
+        // activate horizontal scrolling
+        graph.getViewport().setScrollableY(true);
+        //dont display vertical line at 0
+        graph.getGridLabelRenderer().setHighlightZeroLines(false);
+
+        //sets bounds for the graphic
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(100);
+
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(100);
     }
 
     @Override
@@ -283,6 +340,17 @@ public class DeviceControlActivity extends Activity {
             int value=Integer.decode("0x"+val);
             mDataField.setText(Integer.toString(value));
             //Toast.makeText(getBaseContext(),Integer.toString(value),Toast.LENGTH_SHORT).show();
+
+
+
+            if(startTime==-1)
+            {
+                //Maybe set this elsewhere
+                startTime = System.currentTimeMillis() / 1000;
+            }
+
+            //addpoint to the graph series
+           series.appendData(new DataPoint(System.currentTimeMillis() / 1000 -startTime, value), true, 100);
         }
     }
 
