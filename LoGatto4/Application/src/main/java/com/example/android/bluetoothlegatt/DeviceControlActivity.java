@@ -26,7 +26,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +36,7 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +67,9 @@ public class DeviceControlActivity extends Activity {
 
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
+
+    Thread thread;
+    Handler handler;
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -168,10 +174,27 @@ public class DeviceControlActivity extends Activity {
         mConnectionState = (TextView) findViewById(R.id.connection_state);
         mDataField = (TextView) findViewById(R.id.data_value);
 
+
+        thread=new Thread(new myThread());
+        thread.start();
+        handler=new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+
+                //Toast.makeText(getBaseContext(),"THREAD STUFF",Toast.LENGTH_SHORT).show();
+                if(mBluetoothLeService != null) {
+                    mBluetoothLeService.readCustomCharacteristic();
+                }
+            }
+        };
+
         getActionBar().setTitle(mDeviceName);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+
+
+
     }
 
     @Override
@@ -316,6 +339,24 @@ public class DeviceControlActivity extends Activity {
     public void onClickRead(View v){
         if(mBluetoothLeService != null) {
             mBluetoothLeService.readCustomCharacteristic();
+        }
+    }
+
+    class myThread implements Runnable{
+        @Override
+        public void run() {
+            for(int i=0;i<100;i++)
+            {
+                Message message =Message.obtain();
+
+                handler.sendMessage(message);
+
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
