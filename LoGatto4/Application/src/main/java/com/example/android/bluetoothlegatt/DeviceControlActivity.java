@@ -59,6 +59,8 @@ public class DeviceControlActivity extends Activity {
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
+
+    int points=0;
     private TextView mConnectionState;
     private TextView mDataField;
     private String mDeviceName;
@@ -350,7 +352,13 @@ public class DeviceControlActivity extends Activity {
             }
 
             //addpoint to the graph series
-           series.appendData(new DataPoint(System.currentTimeMillis() / 1000 -startTime, value), true, 100);
+            boolean scroll=false;
+            if(points>20)
+                scroll=true;
+
+            points++;
+
+           series.appendData(new DataPoint(System.currentTimeMillis() / 1000 -startTime, value), scroll, 30);
         }
     }
 
