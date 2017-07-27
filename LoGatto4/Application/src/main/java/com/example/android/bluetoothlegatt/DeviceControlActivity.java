@@ -56,10 +56,12 @@ import java.util.List;
 public class DeviceControlActivity extends Activity {
     private final static String TAG = DeviceControlActivity.class.getSimpleName();
 
+
+    //variables that hold device name and mac address
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
-
+    //textviews where value will be put
     TextView tensao1;
     TextView tensao2;
     TextView tensao3;
@@ -67,8 +69,9 @@ public class DeviceControlActivity extends Activity {
     TextView temperatura;
     TextView corrente;
 
-
+    //number of points on the graph
     int points=0;
+
     private TextView mConnectionState;
     private TextView mDataField;
     private String mDeviceName;
@@ -83,18 +86,22 @@ public class DeviceControlActivity extends Activity {
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
 
+
+    //thread que vai ler os valores fornecidos pela BMS a cada 5 segundos
     Thread thread;
     Handler handler;
+
 
     //graphic stuff
     //graphic element
     GraphView graph;
 
-    //series for 3 values, voltage current temperature
+    //3 lines in the graphic, voltage current temperature
     LineGraphSeries<DataPoint> series;
     LineGraphSeries<DataPoint> seriesI;
     LineGraphSeries<DataPoint> seriesT;
 
+    //define a primeira vez que um ponto foi adicionado ao grafico
     long startTime=-1;
 
     // Code to manage Service lifecycle.
@@ -200,6 +207,8 @@ public class DeviceControlActivity extends Activity {
         mConnectionState = (TextView) findViewById(R.id.connection_state);*/
         mDataField = (TextView) findViewById(R.id.data_value);
 
+
+        //initialization of textviews
         tensao1 = (TextView)findViewById(R.id.volt);
         tensao2 = (TextView)findViewById(R.id.volt1);
         tensao3 = (TextView)findViewById(R.id.volt2);
@@ -208,14 +217,18 @@ public class DeviceControlActivity extends Activity {
         temperatura = (TextView)findViewById(R.id.temp);
         corrente = (TextView)findViewById(R.id.curr);
 
-//UNCOMMENT THIS CODE TO MAKE THREAD RUN
+        //create a thread and make it be of class myThread
         thread=new Thread(new myThread());
+
+        //start thread
         thread.start();
+
+        //set what to do when event happens
         handler=new Handler(){
             @Override
             public void handleMessage(Message msg) {
 
-                //Toast.makeText(getBaseContext(),"THREAD STUFF",Toast.LENGTH_SHORT).show();
+                //read characterisrics in BLE
                 if(mBluetoothLeService != null) {
                     mBluetoothLeService.readCustomCharacteristic();
                 }
@@ -229,7 +242,7 @@ public class DeviceControlActivity extends Activity {
 
 
 
-        //graphics stuff
+        //assign grahic to view
         graph=(GraphView)findViewById(R.id.graph1);
 
 
@@ -335,19 +348,19 @@ public class DeviceControlActivity extends Activity {
 
     private void displayData(String data) {
 
+        //auxiliar string
         String val;
+
+        //auxiliar float
         float floataux;
+
+        //value to add to plot
         float tensaoplot;
 
+        //data was transmitted
         if (data != null) {
-          //  mDataField.setText(data);
-
-            //THIS LINE DOES THE TRICK BUT ONLY IN THiS SITUATION
-           // mDataField.setText(Integer.toString(data.charAt(0)));
-
 
             //FOR DEBUGGING PURPOSES
-
             for (int i=0; i<data.length();i++)
             {
                // String val = data.substring(i,i+1);
@@ -356,7 +369,7 @@ public class DeviceControlActivity extends Activity {
                 Log.d(TAG,Integer.toString(chars));
             }
 
-            //tensao 1
+            //sets tensao 1
             val = data.substring(7,9);
             floataux=Integer.valueOf(val)/10.0f;
             tensao1.setText(Float.toString(floataux) + " V");
@@ -388,15 +401,7 @@ public class DeviceControlActivity extends Activity {
             floataux=Integer.valueOf(val);///10.0f;
             corrente.setText(Float.toString(floataux) + " mA");
 
-           /*
-            Log.d(TAG,val);
-            //Toast.makeText(getBaseContext(),val,Toast.LENGTH_SHORT).show();
-            int value=Integer.decode("0x"+val);
-            mDataField.setText(Integer.toString(value));*/
-            //Toast.makeText(getBaseContext(),Integer.toString(value),Toast.LENGTH_SHORT).show();
-
-
-
+           //starts counting time if it has not yet started
             if(startTime==-1)
             {
 
@@ -404,12 +409,15 @@ public class DeviceControlActivity extends Activity {
             }
 
             //addpoint to the graph series
+
+            //set it to scroll after 20 points added
             boolean scroll=false;
             if(points>20)
                 scroll=true;
 
             points++;
 
+            //add point to graphic
            series.appendData(new DataPoint(System.currentTimeMillis() / 1000 -startTime, tensaoplot), scroll, 30);
         }
     }
@@ -480,34 +488,43 @@ public class DeviceControlActivity extends Activity {
         return intentFilter;
     }
 
+
+    //used during testing to write characteristic
     public void onClickWrite(View v){
         if(mBluetoothLeService != null) {
             mBluetoothLeService.writeCustomCharacteristic(0xAA);
         }
     }
 
+    //used during testing to read characteristic
     public void onClickRead(View v){
         if(mBluetoothLeService != null) {
             mBluetoothLeService.readCustomCharacteristic();
         }
     }
 
+    //used during testing to set to notify a characteristic
     public void onClickNotify(View v){
         if(mBluetoothLeService != null) {
             mBluetoothLeService.notifyCustomCharacteristic(1);
         }
     }
 
+    //thread that is running
     class myThread implements Runnable{
         @Override
         public void run() {
-            for(int i=0;i<100;i++)
+
+            //stops running after 5*1000 seconds -> 83 minutos
+            for(int i=0;i<1000;i++)
             {
                 Message message =Message.obtain();
 
+                //calls handler
                 handler.sendMessage(message);
 
                 try {
+                    //tries to sleep thread
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
