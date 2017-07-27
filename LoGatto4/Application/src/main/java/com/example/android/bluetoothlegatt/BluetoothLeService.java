@@ -67,8 +67,10 @@ public class BluetoothLeService extends Service {
             UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
 
     public  final  static  UUID UUID_BATTERY_SERVICE =UUID.fromString("0000180F-0000-1000-8000-00805f9b34fb");
-
     public  final static  UUID UUID_BATTERY_CHARA=UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb");
+
+    public  final  static  UUID UUID_PRIVATE_SERVICE=UUID.fromString("11223344-5566-7788-9900-AABBCCDDEEFF");
+    public  final static  UUID UUID_PRIVATE_CHARA=UUID.fromString("01020304-0506-0708-0900-0A0B0C0D0E0F");
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
@@ -329,13 +331,25 @@ public class BluetoothLeService extends Service {
             return;
         }
         /*check if the service is available on the device*/
-        BluetoothGattService mCustomService = mBluetoothGatt.getService(UUID_BATTERY_SERVICE);
+        /*BluetoothGattService mCustomService = mBluetoothGatt.getService(UUID_BATTERY_SERVICE);
+        if(mCustomService == null){
+            Log.w(TAG, "Custom BLE Service not found");
+            return;
+        }*/
+        /*get the read characteristic from the service*/
+       /* BluetoothGattCharacteristic mReadCharacteristic = mCustomService.getCharacteristic(UUID_BATTERY_CHARA);
+        if(mBluetoothGatt.readCharacteristic(mReadCharacteristic) == false){
+            Log.w(TAG, "Failed to read characteristic");
+        }
+        */
+         /*check if the service is available on the device*/
+        BluetoothGattService mCustomService = mBluetoothGatt.getService(UUID_PRIVATE_SERVICE);
         if(mCustomService == null){
             Log.w(TAG, "Custom BLE Service not found");
             return;
         }
         /*get the read characteristic from the service*/
-        BluetoothGattCharacteristic mReadCharacteristic = mCustomService.getCharacteristic(UUID_BATTERY_CHARA);
+        BluetoothGattCharacteristic mReadCharacteristic = mCustomService.getCharacteristic(UUID_PRIVATE_CHARA);
         if(mBluetoothGatt.readCharacteristic(mReadCharacteristic) == false){
             Log.w(TAG, "Failed to read characteristic");
         }

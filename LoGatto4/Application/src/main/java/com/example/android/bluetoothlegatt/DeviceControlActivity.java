@@ -60,6 +60,14 @@ public class DeviceControlActivity extends Activity {
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
 
+    TextView tensao1;
+    TextView tensao2;
+    TextView tensao3;
+    TextView tensao4;
+    TextView temperatura;
+    TextView corrente;
+
+
     int points=0;
     private TextView mConnectionState;
     private TextView mDataField;
@@ -192,6 +200,14 @@ public class DeviceControlActivity extends Activity {
         mConnectionState = (TextView) findViewById(R.id.connection_state);*/
         mDataField = (TextView) findViewById(R.id.data_value);
 
+        tensao1 = (TextView)findViewById(R.id.volt);
+        tensao2 = (TextView)findViewById(R.id.volt1);
+        tensao3 = (TextView)findViewById(R.id.volt2);
+        tensao4 = (TextView)findViewById(R.id.volt3);
+
+        temperatura = (TextView)findViewById(R.id.temp);
+        corrente = (TextView)findViewById(R.id.curr);
+
 //UNCOMMENT THIS CODE TO MAKE THREAD RUN
         thread=new Thread(new myThread());
         thread.start();
@@ -249,7 +265,7 @@ public class DeviceControlActivity extends Activity {
         //sets bounds for the graphic
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinY(0);
-        graph.getViewport().setMaxY(100);
+        graph.getViewport().setMaxY(5);
 
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(0);
@@ -318,36 +334,72 @@ public class DeviceControlActivity extends Activity {
     }
 
     private void displayData(String data) {
+
+        String val;
+        float floataux;
+        float tensaoplot;
+
         if (data != null) {
-            mDataField.setText(data);
+          //  mDataField.setText(data);
 
             //THIS LINE DOES THE TRICK BUT ONLY IN THiS SITUATION
            // mDataField.setText(Integer.toString(data.charAt(0)));
 
 
             //FOR DEBUGGING PURPOSES
-            /*
+
             for (int i=0; i<data.length();i++)
             {
                // String val = data.substring(i,i+1);
                 int chars= data.charAt(i);
                 //Toast.makeText(getBaseContext(),val,Toast.LENGTH_SHORT).show();
                 Log.d(TAG,Integer.toString(chars));
-            }*/
+            }
 
+            //tensao 1
+            val = data.substring(7,9);
+            floataux=Integer.valueOf(val)/10.0f;
+            tensao1.setText(Float.toString(floataux) + " V");
 
-            String val = data.substring(2,4);
+            tensaoplot=floataux;
+
+            //tensao 2
+            val = data.substring(10,12);
+            floataux=Integer.valueOf(val)/10.0f;
+            tensao2.setText(Float.toString(floataux) + " V");
+
+            //tensao 3
+            val = data.substring(13,15);
+            floataux=Integer.valueOf(val)/10.0f;
+            tensao3.setText(Float.toString(floataux) + " V");
+
+            //tensao 4
+            val = data.substring(16,18);
+            floataux=Integer.valueOf(val)/10.0f;
+            tensao4.setText(Float.toString(floataux) + " V");
+
+            //temperatura
+            val = data.substring(19,21);
+            floataux=Integer.valueOf(val);///10.0f;
+            temperatura.setText(Float.toString(floataux) + " ºC");
+
+            //corrente
+            val = data.substring(22,24);
+            floataux=Integer.valueOf(val);///10.0f;
+            corrente.setText(Float.toString(floataux) + " mA");
+
+           /*
             Log.d(TAG,val);
             //Toast.makeText(getBaseContext(),val,Toast.LENGTH_SHORT).show();
             int value=Integer.decode("0x"+val);
-            mDataField.setText(Integer.toString(value));
+            mDataField.setText(Integer.toString(value));*/
             //Toast.makeText(getBaseContext(),Integer.toString(value),Toast.LENGTH_SHORT).show();
 
 
 
             if(startTime==-1)
             {
-                //Maybe set this elsewhere
+
                 startTime = System.currentTimeMillis() / 1000;
             }
 
@@ -358,7 +410,7 @@ public class DeviceControlActivity extends Activity {
 
             points++;
 
-           series.appendData(new DataPoint(System.currentTimeMillis() / 1000 -startTime, value), scroll, 30);
+           series.appendData(new DataPoint(System.currentTimeMillis() / 1000 -startTime, tensaoplot), scroll, 30);
         }
     }
 

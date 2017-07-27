@@ -37,4 +37,9 @@
     <string name="voltage">Tensão:</string>
     <string name="current">Corrente:</string>
     <string name="temperature">Temperatura:</string>
+    <string name="tensoes">tensões:</string>
+    <string name="voltage1">Bateria 1:</string>
+    <string name="voltage2">Bateria 2:</string>
+    <string name="voltage3">Bateria 3:</string>
+    <string name="voltage4">Bateria 4:</string>
 </resources>
