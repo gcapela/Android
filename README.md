@@ -2,7 +2,7 @@
 Android appication that communicates via Bluetooth Low Energy with a Battery Management system to monitor its information
 ===================================
 
-Esta aplicacao foi desenvolvida  durante o estágio com o IPFN e a coloumb picma sendo que tem como objectivo monitorizar os parâmetros de uma battery management system.
+This application was developped during a summer intership of IPFN and picma.net, and its objective was to monitor the parameters of a battery management system.
 
 
 Here is a screenshot of the app working
